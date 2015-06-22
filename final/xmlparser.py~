@@ -1,0 +1,138 @@
+#!/usr/bin/python
+
+from xml.sax.handler import ContentHandler
+from xml.sax import make_parser
+import sys
+from datetime import datetime
+from models import Actividad, Usuario
+import string
+import urllib, urllib2
+from bs4 import BeautifulSoup
+
+def normalize_whitespace(text):
+    "Elimina espacios en blanco cuando haya mas de uno"
+    return string.join(string.split(text), ' ')
+
+class CounterHandler(ContentHandler):
+
+    def __init__(self):
+        "Inicalizamos todos los atributos a 0 o vacio"
+        self.inContent = 0
+        self.Content = ""
+        self.atributo = ""
+        self.titulo = ""
+        self.tipo = ""
+        self.gratis = ""
+        self.precio = ""
+        self.fecha = ""
+        self.hora = ""
+        self.horalarga = ""
+        self.url = ""
+        self.repe = 0   
+
+    def startElement(self, name, attrs):
+        "Aqui se si estas etiquetas tienen contenido"
+        if name == 'atributo':
+            self.atributo = normalize_whitespace(attrs.get('nombre'))
+        if self.atributo == 'TITULO':
+            self.inContent = 1
+        elif self.atributo == 'GRATUITO':
+            self.inContent = 1
+        elif self.atributo == 'PRECIO':
+            self.inContent = 1
+        elif self.atributo == 'EVENTO-LARGA-DURACION':
+            self.inContent = 1
+        elif self.atributo == 'FECHA-EVENTO':
+            self.inContent = 1
+        elif self.atributo == 'FECHA-FIN-EVENTO':
+            self.inContent = 1
+        elif self.atributo == 'HORA-EVENTO':
+            self.inContent = 1
+        elif self.atributo == 'CONTENT-URL':
+            self.inContent = 1
+        elif self.atributo == 'TIPO':
+            self.inContent = 1
+
+def endElement(self, name):
+    "Aqui ya me voy a ir quedando con lo que nos interesa"
+    if self.inContent:
+        self.Content = normalize_whitespace(self.Content)
+    if self.atributo == 'TITULO':
+        for linea in total:
+            if linea.titulo == self.Content:
+                self.repe = 1
+        if self.repe == 0:
+            self.titulo = self.Content
+        #Esto lo he tenido que hacer porque hay titulos repetidos
+    elif self.atributo == 'GRATUITO' and self.repe == 0:
+        if self.content == '1':
+            self.precio = '0 Euros!'
+        else:
+            if self.precio == "":
+                self.precio = 'Consultar por tfno'
+
+    elif self.atributo == 'PRECIO' and self.repe == 0:
+        self.precio = self.Content
+
+    elif self.atributo == 'EVENTO-LARGA-DURACION' and self.repe == 0:
+        if self.Content == '1':
+            self.horalarga = 'Si'
+        else:
+            self.horalarga = 'No'
+
+    elif self.atributo == 'HORA-EVENTO' and self.repe == 0:
+        self.hora = self.Content
+    
+    elif self.atributo == 'FECHA-EVENTO' and self.repe == 0:
+        self.fecha = self.Content.split(' ')[0].replace('-', ' ')
+        self.fecha = datetime.strptime(self.fecha, '%Y %m %d')
+
+    elif self.atributo == 'CONTENT-URL' and self.repe == 0:
+        self.url = self.Content
+        #urlDescrip = urllib2.urlopen(self.url)
+        #html = urDescrip.read()
+        #urlDescrip.close()
+        #soup = BeautifulSoup(html)
+        #tag = soup.find("a", {"class":"punteado"})
+        #if tag == None:
+            #self.url = 'No tenemos mas info'
+        #else:
+            #self.url = tag.attrs['href']
+
+    elif self.atributo == 'TIPO':
+        if self.Conten.find('/') == -1:
+            self.inContent = 0
+        else:
+            if self.repe == 0:
+                self.tipo = self.Content.split('/')[3]
+                actividad = Actividad(titulo=self.titulo, tipo=self.tipo, precio=self.precio, fecha = self.fecha, hora = self.hora)
+                actividad.save()
+                self.titulo = ""
+                self.tipo = ""
+                self.gratis = ""
+                self.precio = ""
+                self.fecha = ""
+                self.hora = ""
+                self.horalarga = ""
+                self.url = ""
+            else:
+                self.repe = 0
+
+    if self.inContent:
+        self.inContent = 0
+        self.Content = ""
+
+    def characters(self, chars):
+        if self.inContent:
+            self.Content = self.Content + chars
+
+def Parse_Not():
+
+    Parser = make_parser()
+    Handler = CounterHandler()
+    Parser.setContentHandler(Handler)
+    xml = urllib.urlopen('http://datos.madrid.es/portal/site/egob/menuitem.ac61933d6ee3c31cae77ae7784f1a5a0/?vgnextoid=00149033f2201410VgnVCM100000171f5a0aRCRD&format=xml&file=0&filename=206974-0-agenda-eventos-culturales-100&mgmtid=6c0b6d01df986410VgnVCM2000000c205a0aRCRD')
+    Parser.parse(xml)
+    return ('Pos parseao')
+
+print "Parse completado"

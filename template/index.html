@@ -1,0 +1,73 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+"http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html>
+
+<head>
+<meta http-equiv="content-type" content="text/html; charset=iso-8859-1"/>
+<meta name="description" content="description"/>
+<meta name="keywords" content="keywords"/> 
+<meta name="author" content="author"/> 
+<link rel="stylesheet" type="text/css" href="/css/default.css" media="screen"/>
+<link rel="shortcut icon" href="/css/img/gsyc.png" />
+</head>
+
+<body>
+
+<div class="wrapper">
+
+	<div id ="loggin">
+
+		<div class="main">		
+			
+			<div class="content">
+
+				<div class="title">Actividades Culturales Madrid</div>
+				
+				
+				<h2>Tenemos estas actividades</h2>
+                    <h2>
+                        {{titulo|safe}}
+                    </h2>
+			{{busqueda|safe}}
+			
+                        {{contenido|safe}}
+			
+			
+                        
+                        
+					</div>
+
+
+			</div>
+
+			<div class="sidenav">
+
+				<h2>{{loggin|safe}}</h2>
+				<ul>
+					<li><a href="/">INICIO</a></li>
+					<li><a href="/todas">ACTIVIDADES</a></li>
+					<li><a href="/register">REGISTRARSE</a></li>
+					<li>{{rss|safe}}</li>
+					<li><a href="/ayuda">AYUDA</a></li>
+					{{personales|safe}}
+					{{cuerpo_user|safe}}
+					
+				</ul>
+
+			</div>
+
+			<div class="clearer"></div>
+
+		</div>
+
+		<div class="footer">
+		{{pie|safe}}
+		</div>
+
+	</div>
+
+</div>
+
+</body>
+
+</html>
